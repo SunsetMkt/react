@@ -26,7 +26,7 @@ import {
 import {
   createResponse as createFlightResponse,
   getRoot as getFlightRoot,
-  processBinaryChunk as processFlightBinaryChunk,
+  processStringChunk as processFlightStringChunk,
   close as closeFlight,
 } from 'react-client/src/ReactFlightClient';
 
@@ -80,12 +80,10 @@ export function renderToMarkup(
   options?: MarkupOptions,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    const textEncoder = new TextEncoder();
     const flightDestination = {
       push(chunk: string | null): boolean {
         if (chunk !== null) {
-          // TODO: Legacy should not use binary streams.
-          processFlightBinaryChunk(flightResponse, textEncoder.encode(chunk));
+          processFlightStringChunk(flightResponse, chunk);
         } else {
           closeFlight(flightResponse);
         }
@@ -170,6 +168,7 @@ export function renderToMarkup(
       handleFlightError,
       options ? options.identifierPrefix : undefined,
       undefined,
+      undefined,
       'Markup',
       undefined,
     );
@@ -181,6 +180,7 @@ export function renderToMarkup(
       undefined,
       undefined,
       undefined,
+      false,
     );
     const resumableState = createResumableState(
       options ? options.identifierPrefix : undefined,
